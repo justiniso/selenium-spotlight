@@ -1,0 +1,14 @@
+.spotlight-highlight {
+    min-width: 10px;
+    min-height: 10px;
+    position: absolute;
+
+    border-radius: 8px;
+    opacity: 0.6;
+    background-color: yellow;
+    border: 2px solid orange;
+    border-radius: 4px;
+
+    z-index: 2147483647;
+    pointer-events: none;
+}
