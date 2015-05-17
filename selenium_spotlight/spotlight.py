@@ -4,13 +4,8 @@ from selenium.webdriver.support.abstract_event_listener import AbstractEventList
 current_dir = os.path.dirname(os.path.realpath(__file__))
 
 # All template files
-css_injection_js = os.path.join(current_dir, 'static', 'js', 'injectCss.js')
-message_css_file = os.path.join(current_dir, 'static', 'css', 'message.css')
-message_injection_file = os.path.join(current_dir, 'static', 'js', 'messageDisplay.js')
-message_cleanup_file = os.path.join(current_dir, 'static', 'js', 'messageCleanup.js')
-highlight_css_file = os.path.join(current_dir, 'static', 'css', 'highlight.css')
-highlight_element_file = os.path.join(current_dir, 'static', 'js', 'highlightElement.js')
-highlight_cleanup_file = os.path.join(current_dir, 'static', 'js', 'highlightCleanup.js')
+css_file = os.path.join(current_dir, 'static', 'css', 'spotlight.css')
+js_file = os.path.join(current_dir, 'static', 'js', 'spotlight.js')
 
 
 class JavascriptFileMixin(object):
@@ -33,27 +28,25 @@ class JavascriptFileMixin(object):
 class SpotlightMixin(JavascriptFileMixin):
     """Mixin to display visual feedback while Selenium is running"""
 
+    def inject_spotlight(self):
+        with open(css_file) as f:
+            css = f.read()
+        self.execute_javascript_file(js_file)
+        self.execute_script('window.spotlight.injectCss(arguments[0])', css)
+
     def display_message(self, message):
         """Display a message in the browser window for debugging purposes"""
-
-        with open(message_css_file) as f:
-            css = f.read()
-        self.execute_javascript_file(message_injection_file, message)
-        self.execute_javascript_file(css_injection_js, css)
+        self.inject_spotlight()
+        self.excute_script('window.spotlight.dislayMessage(arguments[0])', message)
 
     def highlight_element(self, element):
         """Display a colored box around an element"""
-
-        with open(highlight_css_file) as f:
-            css = f.read()
-
-        self.cleanup_highlight()
-        self.execute_javascript_file(highlight_element_file, element)
-        self.execute_javascript_file(css_injection_js, css)
+        self.inject_spotlight()
+        self.execute_script('window.spotlight.highlightElement(arguments[0])', element)
 
     def cleanup_highlight(self):
-
-        self.execute_javascript_file(highlight_cleanup_file)
+        self.inject_spotlight()
+        self.execute_script('window.spotlight.removeElementsByClass(window.spotlight.highlightClass)')
 
 
 class SpotlightListener(AbstractEventListener):
